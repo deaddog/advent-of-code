@@ -1,0 +1,12 @@
+body {
+    font-family: system-ui, sans-serif;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}

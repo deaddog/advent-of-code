@@ -1,0 +1,32 @@
+package main
+
+import "fmt"
+
+templ layout(days []int, content templ.Component) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/static/styles.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.9.9" />
+    <title>Document</title>
+</head>
+<body>
+    <nav>
+    for _, d := range days {
+        <div
+            hx-get={ fmt.Sprintf("/day%d", d) }
+            hx-trigger="click"
+            hx-target="#contents"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+            >
+            day { fmt.Sprint(d) }
+        </div>
+    }
+    </nav>
+    <div id="contents">@content</div>
+</body>
+</html>
+}
