@@ -15,7 +15,7 @@ templ layout(days []int, content templ.Component) {
 <body>
     <nav>
     for _, d := range days {
-        <div
+        <div class={ HeaderLink() }
             hx-get={ fmt.Sprintf("/day%d", d) }
             hx-trigger="click"
             hx-target="#contents"
@@ -29,4 +29,13 @@ templ layout(days []int, content templ.Component) {
     <div id="contents">@content</div>
 </body>
 </html>
+}
+
+css HeaderLink() {
+    cursor: pointer;
+    color: dodgerblue;
+}
+
+templ ErrTemplate(err error) {
+    <div>{ fmt.Sprint(err) }</div>
 }

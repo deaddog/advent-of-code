@@ -1,5 +1,55 @@
 package day1
 
-templ DayTemplate() {
-    <div>DAY 1</div>
+import "fmt"
+
+func Solution(content string) (templ.Component, error) {
+    lines, err := Solve(content)
+    if err != nil {
+        return nil, err
+    }
+
+    return DayTemplate(lines), nil
+}
+
+templ DayTemplate(lines []Line) {
+    <h2>Sums</h2>
+    <div>Part 1: { fmt.Sprint(Sum1(lines)) }</div>
+    <div>Part 2: { fmt.Sprint(Sum2(lines)) }</div>
+
+    <h2>Days</h2>
+    <table>
+        <thead>
+            <th>Part 1</th>
+            <th>Part 2</th>
+        </thead>
+        for _, l := range lines {
+        <tr>
+            <td class={code()}>@ElementsTemplate(l.Calibration1.Elements)</td>
+            <td class={result()}>{ fmt.Sprint(l.Calibration1.Value) }</td>
+            <td class={code()}>@ElementsTemplate(l.Calibration2.Elements)</td>
+            <td class={result()}>{ fmt.Sprint(l.Calibration2.Value) }</td>
+        </tr>
+        }
+    </table>
+}
+
+css code() {
+    font-family: monospace;
+}
+
+css number() {
+    color: #39ad00;
+    text-decoration: underline;
+}
+
+css result() {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+templ ElementsTemplate(elements []Element) {
+    for _, e := range elements {
+        <span class={templ.KV(number(), e.IsNumber)}>{ e.Content }</span>
+    }
 }

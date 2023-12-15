@@ -2,8 +2,11 @@ package main
 
 import (
 	"adventofcode/day1"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"time"
@@ -13,10 +16,18 @@ import (
 
 var dayPathRegex = regexp.MustCompile("^/day([0-9]+)")
 
-func main() {
+type DayConfig struct {
+	Filename  string
+	Component func(string) (templ.Component, error)
+}
 
-	days := map[int]func() templ.Component{}
-	days[1] = day1.DayTemplate
+func main() {
+	days := map[int]DayConfig{
+		1: {
+			Filename:  "day1",
+			Component: day1.Solution,
+		},
+	}
 
 	slice := []int{}
 	for d := range days {
@@ -33,12 +44,14 @@ func main() {
 				return
 			}
 
-			if comp, ok := days[day]; ok {
+			if config, ok := days[day]; ok {
+				component := config.getComponent()
+
 				if r.Header.Get("Hx-Request") != "true" {
-					templ.Handler(layout(slice, comp())).ServeHTTP(w, r)
-				} else {
-					templ.Handler(comp()).ServeHTTP(w, r)
+					component = layout(slice, component)
 				}
+
+				templ.Handler(component).ServeHTTP(w, r)
 				return
 			}
 		}
@@ -47,6 +60,34 @@ func main() {
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func (cfg *DayConfig) getData() (string, error) {
+	p := os.Getenv("ADVENTOFCODE_DATA")
+	if p == "" {
+		return "", fmt.Errorf("no data path set")
+	}
+
+	data, err := os.ReadFile(path.Join(p, cfg.Filename))
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+func (cfg *DayConfig) getComponent() templ.Component {
+	content, err := cfg.getData()
+	if err != nil {
+		return ErrTemplate(err)
+	}
+
+	component, err := cfg.Component(content)
+	if err != nil {
+		return ErrTemplate(err)
+	}
+
+	return component
 }
 
 var epoch = time.Unix(0, 0).Format(time.RFC1123)
